@@ -106,11 +106,13 @@
   padding: 1rem;
   border-radius: 12px;
   color: var(--text-main);
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .ingredient-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .ing-info {
@@ -149,6 +151,26 @@
   font-weight: 600;
   transition: all 0.2s;
   font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Click ripple effect */
+.small-btn:active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.4s ease-out;
+}
+
+@keyframes ripple {
+  to { transform: translate(-50%, -50%) scale(2); opacity: 0; }
 }
 
 .small-btn:hover {
@@ -188,6 +210,10 @@
   filter: brightness(1.2);
 }
 
+.physics-btn:active {
+  transform: translateY(1px);
+}
+
 /* BEAKER AREA */
 .beaker-area {
   grid-area: beaker;
@@ -215,7 +241,11 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  transition: box-shadow 0.5s ease;
 }
+
+.instrument-panel.hot { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.5); }
+.instrument-panel.cold { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); border-color: rgba(59, 130, 246, 0.5); }
 
 .instrument-panel span {
   font-size: 0.9rem;
@@ -265,8 +295,35 @@
   border-top: none;
   border-radius: 0 0 20px 20px;
   z-index: 10;
-  box-shadow: inset 0 -10px 20px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 -10px 20px rgba(255, 255, 255, 0.1), 0 20px 40px rgba(0,0,0,0.5);
   overflow: hidden;
+}
+
+/* Glass Glare for Realism */
+.beaker-glass::after {
+  content: '';
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 15%;
+  height: 85%;
+  background: linear-gradient(to right, rgba(255,255,255,0.2), transparent);
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* Top Lip of the Beaker */
+.beaker-glass::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: calc(100% + 8px);
+  height: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  z-index: 26;
 }
 
 .markers {
@@ -306,7 +363,7 @@
   width: 100%;
   position: absolute;
   left: 0;
-  transition: height 0.5s ease-out, background-color 0.8s ease, bottom 0.5s ease-out;
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.8s ease, bottom 0.5s ease-out;
   z-index: 5;
 }
 
@@ -392,8 +449,16 @@
   background: rgba(0, 0, 0, 0.4);
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.volume-display.target-reached {
+  border-color: #4ade80;
+  color: #4ade80;
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+  transform: scale(1.05);
 }
 
 .action-buttons {
@@ -491,6 +556,8 @@
 .log-panel li {
   margin-bottom: 0.4rem;
   transition: opacity 0.3s;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 /* OVERLAYS */

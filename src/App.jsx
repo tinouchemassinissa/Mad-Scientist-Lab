@@ -356,7 +356,7 @@ function App() {
 
       <section className="beaker-area">
         <div className="instruments">
-          <div className="instrument-panel" style={{width: '180px'}}>
+          <div className={`instrument-panel ${temperature > 40 ? 'hot' : (temperature < 20 ? 'cold' : '')}`} style={{width: '180px'}}>
             <span>{t.thermometer}</span>
             <div className="temp-bar">
               <div className="temp-fill" style={{ height: `${temperature}%`, background: temperature > 40 ? '#ef4444' : (temperature < 20 ? '#38bdf8' : '#22c55e') }}></div>
@@ -419,7 +419,7 @@ function App() {
           </div>
         </div>
 
-        <div className="volume-display">
+        <div className={`volume-display ${totalVolume === mission.targetVolume ? 'target-reached' : ''}`}>
           {totalVolume} / {MAX_VOLUME} units
         </div>
 
