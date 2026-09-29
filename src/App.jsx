@@ -22,6 +22,10 @@ const TRANSLATIONS = {
     nextRecipe: "Next Recipe ➔",
     oilLayer: "Oil (Floating)",
     sugarPile: "Undissolved Sugar",
+    burntTitle: "🔥 BURNT CARAMEL! 🔥",
+    burntDesc: "You added too much sugar and boiled it! It turned into a rock-hard burnt mess!",
+    toxicTitle: "🤢 TOXIC SLUDGE! 🤢",
+    toxicDesc: "You mixed too much vinegar and mustard! It smells terrible!",
     
     ingWater: "Tap Water",
     ingLemon: "Lemon Juice",
@@ -75,6 +79,10 @@ const TRANSLATIONS = {
     nextRecipe: "Recette Suivante ➔",
     oilLayer: "Huile (Flottante)",
     sugarPile: "Sucre non dissous",
+    burntTitle: "🔥 CARAMEL BRÛLÉ ! 🔥",
+    burntDesc: "Vous avez fait bouillir trop de sucre ! C'est devenu dur comme de la pierre !",
+    toxicTitle: "🤢 BOUE TOXIQUE ! 🤢",
+    toxicDesc: "Vous avez mélangé trop de vinaigre et de moutarde ! Ça sent très mauvais !",
 
     ingWater: "Eau du Robinet",
     ingLemon: "Jus de Citron",
@@ -156,13 +164,12 @@ function App() {
   const [currentMissionIdx, setCurrentMissionIdx] = useState(0);
   const [contents, setContents] = useState({ water: 0, lemon: 0, sugar: 0, vinegar: 0, oil: 0, mustard: 0 });
   const [temperature, setTemperature] = useState(20);
-  const [gameState, setGameState] = useState('playing'); // playing, exploded, won
+  const [gameState, setGameState] = useState('playing'); // playing, exploded, won, burnt, toxic
   const [log, setLog] = useState([t.logStart]);
 
   const mission = MISSIONS[currentMissionIdx];
   const totalVolume = Object.values(contents).reduce((a, b) => a + b, 0);
 
-  // When language changes, update log initialization
   useEffect(() => {
     setLog([t.logStart]);
   }, [lang, t.logStart]);
@@ -204,6 +211,9 @@ function App() {
   }, [isSeparated, isEmulsified, contents.oil, t]);
 
   const mixedColorBase = useMemo(() => {
+    if (gameState === 'toxic') return 'rgba(101, 163, 13, 0.9)';
+    if (gameState === 'burnt') return 'rgba(69, 26, 3, 0.9)';
+
     let r = 0, g = 0, b = 0;
     let baseVol = solventVolume + dissolvedSugar + contents.mustard;
     if (isEmulsified) baseVol += contents.oil;
@@ -225,16 +235,34 @@ function App() {
     }
     
     return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
-  }, [contents, solventVolume, dissolvedSugar, isEmulsified]);
+  }, [contents, solventVolume, dissolvedSugar, isEmulsified, gameState]);
 
+  // Check for catastrophies!
   useEffect(() => {
     if (gameState !== 'playing') return;
+
+    // 1. Burnt Caramel: Lots of sugar, low solvent, high heat
+    if (contents.sugar >= 30 && temperature >= 90 && solventVolume < contents.sugar) {
+      setGameState('burnt');
+      addLog("🔥 SUGAR BURNED!");
+      return;
+    }
+
+    // 2. Toxic Sludge: Vinegar + Mustard (Lots of it)
+    if (contents.vinegar >= 30 && contents.mustard >= 20) {
+      setGameState('toxic');
+      addLog("🤢 TOXIC REACTION!");
+      return;
+    }
+
+    // 3. Overflow
     if (totalVolume > MAX_VOLUME) {
       setGameState('exploded');
       addLog(t.logOverflow);
     }
-  }, [totalVolume, gameState, t]);
+  }, [contents, temperature, solventVolume, totalVolume, gameState, t]);
 
+  // Win Checker
   useEffect(() => {
     if (gameState === 'playing') {
       if (mission.validate(totalVolume, temperature, contents, dissolvedSugar, isEmulsified)) {
@@ -243,13 +271,14 @@ function App() {
     }
   }, [totalVolume, temperature, contents, dissolvedSugar, isEmulsified, mission, gameState]);
 
+  // Auto-reset catastrophies
   useEffect(() => {
-    if (gameState === 'exploded') {
+    if (['exploded', 'burnt', 'toxic'].includes(gameState)) {
       const timer = setTimeout(() => {
         setGameState('playing');
         setContents({ water: 0, lemon: 0, sugar: 0, vinegar: 0, oil: 0, mustard: 0 });
         setTemperature(20);
-      }, 3000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [gameState]);
@@ -420,6 +449,20 @@ function App() {
         <div className="explosion-overlay">
           <h2>{t.overflow}</h2>
           <p>{t.overflowDesc}</p>
+        </div>
+      )}
+
+      {gameState === 'burnt' && (
+        <div className="burnt-overlay">
+          <h2>{t.burntTitle}</h2>
+          <p>{t.burntDesc}</p>
+        </div>
+      )}
+
+      {gameState === 'toxic' && (
+        <div className="toxic-overlay">
+          <h2>{t.toxicTitle}</h2>
+          <p>{t.toxicDesc}</p>
         </div>
       )}
 
