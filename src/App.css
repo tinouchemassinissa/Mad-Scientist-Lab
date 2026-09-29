@@ -631,28 +631,119 @@
   .app-container {
     width: 100vw;
     min-height: 100vh;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0.5rem;
+    gap: 0.8rem;
     border-radius: 0;
     border: none;
+    grid-template-areas:
+      "header"
+      "target"
+      "beaker"
+      "shelf";
   }
   
   .header h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   .header p {
     display: none;
   }
-
-  .beaker-container {
-    transform: scale(0.85);
+  
+  .lang-switcher {
+    margin-bottom: 0.5rem;
   }
 
-  .instruments {
+  /* Ultra-compact Target Area */
+  .target-area {
+    padding: 0.8rem;
+    gap: 0.5rem;
+  }
+  .target-area h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    padding-bottom: 0.2rem;
+  }
+  .mission-card {
+    padding: 0.8rem;
+  }
+  .mission-instructions {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  .log-panel {
+    padding: 0.8rem;
+  }
+  .log-panel ul {
+    font-size: 0.75rem;
+  }
+
+  /* Compact Beaker Area */
+  .beaker-area {
     gap: 1rem;
   }
+  .beaker-container {
+    height: 180px;
+    width: 130px;
+  }
+  .instruments {
+    gap: 0.5rem;
+  }
+  .instrument-panel {
+    width: auto !important;
+    flex: 1;
+    padding: 0.5rem;
+  }
+  .temp-bar {
+    height: 60px;
+  }
+  .volume-display {
+    font-size: 1.2rem;
+    padding: 0.4rem 0.8rem;
+  }
 
-  .explosion-overlay h2, .win-overlay h2 {
-    font-size: 2.5rem;
+  /* Side-by-side Ingredients */
+  .shelf {
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
+  .shelf h2 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  .button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .ingredient-card {
+    padding: 0.5rem;
+  }
+  .ing-info strong {
+    font-size: 0.9rem;
+  }
+  .formula {
+    font-size: 0.65rem;
+  }
+  .small-btn {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Side-by-side Physics Controls */
+  .physics-controls {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  .physics-btn {
+    flex: 1;
+    font-size: 0.8rem;
+    padding: 0.6rem;
+  }
+
+  .explosion-overlay h2, .win-overlay h2, .burnt-overlay h2, .toxic-overlay h2 {
+    font-size: 2rem;
+  }
+  .explosion-overlay p, .burnt-overlay p, .toxic-overlay p {
+    font-size: 1rem;
   }
 }
