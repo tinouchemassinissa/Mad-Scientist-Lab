@@ -26,6 +26,12 @@ const TRANSLATIONS = {
     burntDesc: "You added too much sugar and boiled it! It turned into a rock-hard burnt mess!",
     toxicTitle: "🤢 TOXIC SLUDGE! 🤢",
     toxicDesc: "You mixed too much vinegar and mustard! It smells terrible!",
+    fryerTitle: "🔥 GREASE FIRE! 🔥",
+    fryerDesc: "You boiled Water and Oil together! The water turned to steam and blasted boiling oil everywhere!",
+    acidTitle: "💥 ACID ERUPTION! 💥",
+    acidDesc: "You heated up too many strong acids and they violently boiled over!",
+    mysteryTitle: "🧪 UNSTABLE MATTER! 🧪",
+    mysteryDesc: "You mixed every single ingredient together! The mixture became highly unstable and exploded!",
     
     ingWater: "Tap Water",
     ingLemon: "Lemon Juice",
@@ -83,6 +89,12 @@ const TRANSLATIONS = {
     burntDesc: "Vous avez fait bouillir trop de sucre ! C'est devenu dur comme de la pierre !",
     toxicTitle: "🤢 BOUE TOXIQUE ! 🤢",
     toxicDesc: "Vous avez mélangé trop de vinaigre et de moutarde ! Ça sent très mauvais !",
+    fryerTitle: "🔥 FEU DE FRITURE ! 🔥",
+    fryerDesc: "Vous avez fait bouillir de l'eau et de l'huile ! L'eau s'est transformée en vapeur et a projeté de l'huile bouillante partout !",
+    acidTitle: "💥 ÉRUPTION ACIDE ! 💥",
+    acidDesc: "Vous avez chauffé trop d'acides forts et ils ont débordé violemment !",
+    mysteryTitle: "🧪 MATIÈRE INSTABLE ! 🧪",
+    mysteryDesc: "Vous avez mélangé tous les ingrédients ! Le mélange est devenu très instable et a explosé !",
 
     ingWater: "Eau du Robinet",
     ingLemon: "Jus de Citron",
@@ -164,7 +176,7 @@ function App() {
   const [currentMissionIdx, setCurrentMissionIdx] = useState(0);
   const [contents, setContents] = useState({ water: 0, lemon: 0, sugar: 0, vinegar: 0, oil: 0, mustard: 0 });
   const [temperature, setTemperature] = useState(20);
-  const [gameState, setGameState] = useState('playing'); // playing, exploded, won, burnt, toxic
+  const [gameState, setGameState] = useState('playing'); 
   const [log, setLog] = useState([t.logStart]);
 
   const mission = MISSIONS[currentMissionIdx];
@@ -255,7 +267,28 @@ function App() {
       return;
     }
 
-    // 3. Overflow
+    // 3. Boiling Oil / Grease Fire
+    if (contents.oil >= 20 && contents.water >= 10 && temperature >= 90) {
+      setGameState('fryer');
+      addLog("🔥 GREASE FIRE!");
+      return;
+    }
+
+    // 4. Acid Eruption
+    if (contents.lemon >= 30 && contents.vinegar >= 30 && temperature >= 60) {
+      setGameState('acid');
+      addLog("💥 ACID ERUPTION!");
+      return;
+    }
+
+    // 5. Mystery Sludge Boom
+    if (contents.water > 0 && contents.lemon > 0 && contents.sugar > 0 && contents.vinegar > 0 && contents.oil > 0 && contents.mustard > 0) {
+      setGameState('mystery');
+      addLog("🧪 MYSTERY SLUDGE BOOM!");
+      return;
+    }
+
+    // 6. Overflow
     if (totalVolume > MAX_VOLUME) {
       setGameState('exploded');
       addLog(t.logOverflow);
@@ -273,12 +306,12 @@ function App() {
 
   // Auto-reset catastrophies
   useEffect(() => {
-    if (['exploded', 'burnt', 'toxic'].includes(gameState)) {
+    if (['exploded', 'burnt', 'toxic', 'fryer', 'acid', 'mystery'].includes(gameState)) {
       const timer = setTimeout(() => {
         setGameState('playing');
         setContents({ water: 0, lemon: 0, sugar: 0, vinegar: 0, oil: 0, mustard: 0 });
         setTemperature(20);
-      }, 4000);
+      }, 4500);
       return () => clearTimeout(timer);
     }
   }, [gameState]);
@@ -463,6 +496,27 @@ function App() {
         <div className="toxic-overlay">
           <h2>{t.toxicTitle}</h2>
           <p>{t.toxicDesc}</p>
+        </div>
+      )}
+
+      {gameState === 'fryer' && (
+        <div className="explosion-overlay">
+          <h2>{t.fryerTitle}</h2>
+          <p>{t.fryerDesc}</p>
+        </div>
+      )}
+
+      {gameState === 'acid' && (
+        <div className="explosion-overlay">
+          <h2 style={{color: '#a3e635'}}>{t.acidTitle}</h2>
+          <p>{t.acidDesc}</p>
+        </div>
+      )}
+
+      {gameState === 'mystery' && (
+        <div className="explosion-overlay">
+          <h2 style={{color: '#c084fc'}}>{t.mysteryTitle}</h2>
+          <p>{t.mysteryDesc}</p>
         </div>
       )}
 
